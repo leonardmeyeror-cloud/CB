@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MolécuLearn</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:#F5F0E8; --cream-dark:#EDE6D6; --cream-border:#D9CEB5;
+    --warm-brown:#8B7355; --warm-brown-light:#A08C6E;
+    --ink:#2C2416; --ink-mid:#5A4E3A; --ink-muted:#8B7355;
+    --accent-teal:#2D7A6B; --accent-teal-light:#E8F4F1;
+    --accent-amber:#C4832A; --accent-amber-light:#FBF2E3;
+    --accent-rose:#B85C6E; --accent-rose-light:#F9EDF0;
+    --accent-sage:#5A7A5A; --accent-sage-light:#EDF4ED;
+    --accent-violet:#6B5B9A; --accent-violet-light:#F0EDF8;
+    --white:#FFFDF8;
+    --shadow-soft:0 2px 16px rgba(44,36,22,0.07);
+    --shadow-card:0 4px 24px rgba(44,36,22,0.09);
+    --radius:16px; --radius-sm:10px;
+    --font-display:'Lora',Georgia,serif;
+    --font-body:'DM Sans',system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6;min-height:100vh;}
+  .app{display:flex;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidebar{width:240px;background:var(--white);border-right:1px solid var(--cream-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+  .sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid var(--cream-border);}
+  .logo-mark{font-family:var(--font-display);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-0.3px;}
+  .logo-mark span{color:var(--accent-teal);}
+  .logo-sub{font-size:11px;color:var(--ink-muted);letter-spacing:0.8px;text-transform:uppercase;margin-top:2px;}
+  .sidebar-nav{padding:16px 12px;flex:1;overflow-y:auto;}
+  .nav-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-muted);padding:0 12px;margin:16px 0 8px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:400;color:var(--ink-mid);transition:background .15s,color .15s;text-decoration:none;border:none;background:none;width:100%;text-align:left;}
+  .nav-item:hover{background:var(--cream);color:var(--ink);}
+  .nav-item.active{background:var(--accent-teal-light);color:var(--accent-teal);font-weight:500;}
+  .nav-item svg{width:16px;height:16px;flex-shrink:0;}
+  .nav-subject{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--ink-mid);border:none;background:none;width:100%;text-align:left;transition:background .15s;}
+  .nav-subject:hover{background:var(--cream);}
+  .nav-subject.active{background:var(--accent-teal-light);color:var(--accent-teal);font-weight:500;}
+  .nav-subject-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .nav-subject-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .nav-add-subject{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--ink-muted);border:1.5px dashed var(--cream-border);background:none;width:100%;text-align:left;transition:all .15s;margin-top:6px;}
+  .nav-add-subject:hover{border-color:var(--accent-teal);color:var(--accent-teal);background:var(--accent-teal-light);}
+  .score-pill{margin:0 12px 20px;background:var(--accent-amber-light);border:1px solid #E8C98A;border-radius:var(--radius-sm);padding:12px 16px;}
+  .score-label{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent-amber);}
+  .score-value{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--ink);}
+  .score-pts{font-size:12px;color:var(--warm-brown);margin-left:2px;}
+
+  /* MAIN */
+  .main{margin-left:240px;flex:1;}
+  .topbar{background:var(--white);border-bottom:1px solid var(--cream-border);padding:16px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .topbar-title{font-family:var(--font-display);font-size:18px;font-weight:500;color:var(--ink);}
+  .topbar-actions{display:flex;gap:10px;align-items:center;}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-outline{background:transparent;border:1px solid var(--cream-border);color:var(--ink-mid);}
+  .btn-outline:hover{background:var(--cream);border-color:var(--warm-brown);color:var(--ink);}
+  .btn-primary{background:var(--accent-teal);color:var(--white);border:1px solid transparent;}
+  .btn-primary:hover{background:#236459;}
+  .btn-amber{background:var(--accent-amber);color:var(--white);}
+  .btn-amber:hover{background:#a96e22;}
+  .btn-violet{background:var(--accent-violet);color:var(--white);}
+  .btn-violet:hover{background:#5a4a82;}
+
+  .content{padding:40px;}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,var(--white) 0%,var(--cream-dark) 100%);border:1px solid var(--cream-border);border-radius:20px;padding:40px 48px;margin-bottom:36px;position:relative;overflow:hidden;}
+  .hero::before{content:'⚗';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.08;pointer-events:none;}
+  .hero-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent-teal);font-weight:500;margin-bottom:10px;}
+  .hero-title{font-family:var(--font-display);font-size:32px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:12px;}
+  .hero-title em{color:var(--accent-teal);font-style:italic;}
+  .hero-sub{font-size:15px;color:var(--ink-mid);max-width:480px;line-height:1.6;margin-bottom:24px;}
+
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px;}
+  .stat-card{background:var(--white);border:1px solid var(--cream-border);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;}
+  .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .stat-icon.teal{background:var(--accent-teal-light);}
+  .stat-icon.amber{background:var(--accent-amber-light);}
+  .stat-icon.rose{background:var(--accent-rose-light);}
+  .stat-label{font-size:12px;color:var(--ink-muted);margin-bottom:2px;}
+  .stat-value{font-family:var(--font-display);font-size:26px;font-weight:600;color:var(--ink);}
+
+  /* SECTION */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .section-title{font-family:var(--font-display);font-size:18px;font-weight:500;color:var(--ink);}
+
+  /* SUBJECT TABS */
+  .subject-tabs{display:flex;gap:4px;background:var(--cream-dark);border-radius:12px;padding:4px;margin-bottom:32px;}
+  .subject-tab{flex:1;padding:10px 16px;border-radius:9px;border:none;background:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--ink-mid);transition:all .15s;text-align:center;}
+  .subject-tab:hover{color:var(--ink);}
+  .subject-tab.active{background:var(--white);color:var(--ink);box-shadow:0 1px 6px rgba(44,36,22,.08);}
+
+  /* SUBJECT HEADER */
+  .subject-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
+  .subject-header-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+  .subject-header-title{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--ink);}
+  .subject-header-actions{margin-left:auto;display:flex;gap:8px;}
+
+  /* CARDS */
+  .chapter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px;}
+  .chapter-card{background:var(--white);border:1px solid var(--cream-border);border-radius:var(--radius);padding:24px;cursor:pointer;transition:box-shadow .2s,transform .2s,border-color .2s;position:relative;overflow:hidden;}
+  .chapter-card:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);border-color:var(--warm-brown-light);}
+  .chapter-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
+  .chapter-card.color-teal::after{background:var(--accent-teal);}
+  .chapter-card.color-amber::after{background:var(--accent-amber);}
+  .chapter-card.color-rose::after{background:var(--accent-rose);}
+  .chapter-card.color-sage::after{background:var(--accent-sage);}
+  .chapter-card.color-violet::after{background:var(--accent-violet);}
+  .chapter-card.color-brown::after{background:var(--warm-brown);}
+  .chapter-num{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:8px;}
+  .chapter-name{font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.35;}
+  .chapter-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--ink-muted);}
+  .chapter-progress{margin-top:16px;height:4px;background:var(--cream-dark);border-radius:99px;overflow:hidden;}
+  .chapter-progress-bar{height:100%;border-radius:99px;background:var(--accent-teal);transition:width .4s ease;}
+  .chapter-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:500;}
+  .badge-new{background:var(--accent-teal-light);color:var(--accent-teal);}
+  .badge-done{background:var(--accent-sage-light);color:var(--accent-sage);}
+  .badge-inprogress{background:var(--accent-amber-light);color:var(--accent-amber);}
+
+  /* ANNALE CARD */
+  .annale-card{background:var(--white);border:1px solid var(--cream-border);border-radius:var(--radius);padding:24px;cursor:pointer;transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden;}
+  .annale-card:hover{box-shadow:var(--shadow-card);transform:translateY(-2px);}
+  .annale-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent-violet);border-radius:var(--radius) var(--radius) 0 0;}
+  .annale-meta{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-violet);margin-bottom:8px;}
+  .annale-name{font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);margin-bottom:10px;}
+  .annale-info{font-size:12px;color:var(--ink-muted);}
+
+  /* UPLOAD */
+  .upload-zone{border:2px dashed var(--cream-border);border-radius:var(--radius);padding:36px;text-align:center;cursor:pointer;transition:all .2s;background:var(--white);margin-bottom:24px;}
+  .upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent-teal);background:var(--accent-teal-light);}
+  .upload-zone.violet:hover,.upload-zone.violet.drag-over{border-color:var(--accent-violet);background:var(--accent-violet-light);}
+  .upload-icon{font-size:36px;margin-bottom:12px;}
+  .upload-title{font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);margin-bottom:6px;}
+  .upload-sub{font-size:13px;color:var(--ink-muted);}
+
+  /* OVERLAY / POPUP */
+  .overlay{position:fixed;inset:0;background:rgba(44,36,22,.35);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .overlay.active{opacity:1;pointer-events:all;}
+  .popup{background:var(--white);border-radius:20px;padding:36px;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(44,36,22,.2);transform:translateY(12px);transition:transform .25s;}
+  .overlay.active .popup{transform:translateY(0);}
+  .popup-chapter-label{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:4px;}
+  .popup-title{font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--ink);}
+  .popup-sub{font-size:14px;color:var(--ink-mid);margin-top:6px;margin-bottom:28px;}
+  .popup-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .mode-btn{padding:18px 16px;border-radius:var(--radius);border:1.5px solid var(--cream-border);background:var(--cream);cursor:pointer;text-align:left;transition:all .15s;}
+  .mode-btn:hover{border-color:var(--accent-teal);background:var(--accent-teal-light);}
+  .mode-btn.selected{border-color:var(--accent-teal);background:var(--accent-teal-light);box-shadow:0 0 0 2px rgba(45,122,107,.15);}
+  .mode-btn-icon{font-size:24px;margin-bottom:8px;}
+  .mode-btn-name{font-weight:500;font-size:14px;color:var(--ink);margin-bottom:2px;}
+  .mode-btn-desc{font-size:12px;color:var(--ink-muted);}
+
+  /* QUIZ */
+  .quiz-view{max-width:680px;margin:0 auto;}
+  .quiz-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;}
+  .quiz-back{background:none;border:1px solid var(--cream-border);border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;color:var(--ink-mid);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;}
+  .quiz-back:hover{background:var(--cream);}
+  .quiz-progress-wrap{flex:1;}
+  .quiz-progress-label{font-size:12px;color:var(--ink-muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+  .quiz-progress-bar-bg{height:6px;background:var(--cream-dark);border-radius:99px;overflow:hidden;}
+  .quiz-progress-bar-fill{height:100%;background:var(--accent-teal);border-radius:99px;transition:width .4s ease;}
+  .question-card{background:var(--white);border:1px solid var(--cream-border);border-radius:20px;padding:36px;margin-bottom:20px;box-shadow:var(--shadow-soft);}
+  .question-mode-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:500;margin-bottom:16px;background:var(--accent-teal-light);color:var(--accent-teal);}
+  .question-mode-tag.violet{background:var(--accent-violet-light);color:var(--accent-violet);}
+  .question-text{font-family:var(--font-display);font-size:19px;font-weight:500;color:var(--ink);line-height:1.4;margin-bottom:28px;}
+  .options-list{display:flex;flex-direction:column;gap:10px;}
+  .option{padding:14px 18px;border-radius:var(--radius-sm);border:1.5px solid var(--cream-border);cursor:pointer;font-size:14px;color:var(--ink-mid);transition:all .15s;display:flex;align-items:center;gap:12px;}
+  .option:hover:not(.disabled){border-color:var(--accent-teal);background:var(--accent-teal-light);color:var(--ink);}
+  .option.correct{border-color:var(--accent-sage);background:var(--accent-sage-light);color:var(--accent-sage);}
+  .option.wrong{border-color:var(--accent-rose);background:var(--accent-rose-light);color:var(--accent-rose);}
+  .option.disabled{cursor:default;}
+  .option-letter{width:24px;height:24px;border-radius:50%;background:var(--cream-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;color:var(--ink-mid);}
+  .option.correct .option-letter{background:var(--accent-sage);color:white;}
+  .option.wrong .option-letter{background:var(--accent-rose);color:white;}
+  .feedback-box{border-radius:var(--radius-sm);padding:16px 20px;margin-top:16px;font-size:14px;line-height:1.55;display:none;}
+  .feedback-box.correct{background:var(--accent-sage-light);color:var(--accent-sage);border:1px solid #BDD4BD;display:block;}
+  .feedback-box.wrong{background:var(--accent-rose-light);color:var(--accent-rose);border:1px solid #E8C0CA;display:block;}
+  .tf-options{display:flex;gap:12px;}
+  .tf-btn{flex:1;padding:18px;border:1.5px solid var(--cream-border);border-radius:var(--radius-sm);font-size:15px;font-weight:500;cursor:pointer;background:var(--cream);color:var(--ink-mid);transition:all .15s;}
+  .tf-btn:hover:not(.disabled){border-color:var(--accent-teal);background:var(--accent-teal-light);color:var(--accent-teal);}
+  .tf-btn.correct{border-color:var(--accent-sage);background:var(--accent-sage-light);color:var(--accent-sage);}
+  .tf-btn.wrong{border-color:var(--accent-rose);background:var(--accent-rose-light);color:var(--accent-rose);}
+  .fill-blank-input{width:100%;padding:14px 18px;border:1.5px solid var(--cream-border);border-radius:var(--radius-sm);font-size:15px;font-family:var(--font-body);color:var(--ink);background:var(--cream);outline:none;margin-bottom:12px;transition:border-color .15s;}
+  .fill-blank-input:focus{border-color:var(--accent-teal);background:var(--white);}
+  .quiz-nav{display:flex;justify-content:flex-end;margin-top:12px;}
+
+  /* MECHANISM */
+  .mech-question-box{background:var(--accent-violet-light);border:1px solid #C8C0E0;border-radius:var(--radius-sm);padding:20px 24px;margin-bottom:24px;}
+  .mech-question-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-violet);margin-bottom:8px;font-weight:500;}
+  .mech-question-text{font-family:var(--font-display);font-size:17px;font-weight:500;color:var(--ink);line-height:1.45;}
+  .mech-step{background:var(--cream);border:1px solid var(--cream-border);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;}
+  .mech-step-num{width:28px;height:28px;background:var(--accent-violet);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;}
+  .mech-step-input{flex:1;border:none;background:transparent;font-family:var(--font-body);font-size:14px;color:var(--ink);outline:none;resize:vertical;min-height:42px;line-height:1.5;width:100%;}
+  .mech-step-input::placeholder{color:var(--ink-muted);}
+  .mech-step.validated.ok{border-color:var(--accent-sage);background:var(--accent-sage-light);}
+  .mech-step.validated.wrong{border-color:var(--accent-rose);background:var(--accent-rose-light);}
+  .mech-step-feedback{font-size:12px;margin-top:6px;line-height:1.4;}
+  .mech-step.validated.ok .mech-step-feedback{color:var(--accent-sage);}
+  .mech-step.validated.wrong .mech-step-feedback{color:var(--accent-rose);}
+
+  /* AI PANEL */
+  .ai-panel{position:fixed;right:-420px;top:0;bottom:0;width:400px;background:var(--white);border-left:1px solid var(--cream-border);z-index:150;display:flex;flex-direction:column;transition:right .3s ease;box-shadow:-8px 0 40px rgba(44,36,22,.08);}
+  .ai-panel.open{right:0;}
+  .ai-panel-header{padding:20px 24px;border-bottom:1px solid var(--cream-border);display:flex;align-items:center;justify-content:space-between;}
+  .ai-panel-title{font-family:var(--font-display);font-size:16px;font-weight:500;}
+  .ai-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--cream-border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink-mid);transition:background .15s;}
+  .ai-close:hover{background:var(--cream);}
+  .ai-context-banner{padding:12px 20px;background:var(--accent-teal-light);border-bottom:1px solid #C4DDD8;font-size:12px;color:var(--accent-teal);}
+  .ai-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;}
+  .ai-msg{max-width:85%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.55;}
+  .ai-msg.user{align-self:flex-end;background:var(--accent-teal);color:white;border-radius:14px 14px 4px 14px;}
+  .ai-msg.bot{align-self:flex-start;background:var(--cream-dark);color:var(--ink);border-radius:14px 14px 14px 4px;}
+  .ai-msg.bot.loading{color:var(--ink-muted);font-style:italic;}
+  .ai-input-wrap{padding:16px 20px;border-top:1px solid var(--cream-border);display:flex;gap:10px;}
+  .ai-input{flex:1;padding:10px 14px;border:1px solid var(--cream-border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;color:var(--ink);background:var(--cream);outline:none;resize:none;transition:border-color .15s;}
+  .ai-input:focus{border-color:var(--accent-teal);background:var(--white);}
+  .ai-send{width:40px;height:40px;border-radius:var(--radius-sm);background:var(--accent-teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;transition:background .15s;flex-shrink:0;}
+  .ai-send:hover{background:#236459;}
+  .ai-fab{position:fixed;bottom:28px;right:28px;background:var(--accent-teal);color:white;border:none;border-radius:99px;padding:13px 22px;font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(45,122,107,.35);z-index:130;transition:all .15s;}
+  .ai-fab:hover{background:#236459;transform:translateY(-1px);}
+
+  /* PROCESSING */
+  .processing-card{background:var(--white);border:1px solid var(--cream-border);border-radius:var(--radius);padding:28px 32px;display:flex;align-items:center;gap:20px;margin-bottom:16px;}
+  .processing-spinner{width:36px;height:36px;border:3px solid var(--cream-dark);border-top-color:var(--accent-teal);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+  .processing-spinner.violet{border-top-color:var(--accent-violet);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .processing-name{font-weight:500;font-size:14px;color:var(--ink);margin-bottom:4px;}
+  .processing-status{font-size:12px;color:var(--ink-muted);}
+
+  /* RESULTS */
+  .results-card{background:var(--white);border:1px solid var(--cream-border);border-radius:20px;padding:48px;text-align:center;box-shadow:var(--shadow-soft);}
+  .results-emoji{font-size:56px;margin-bottom:16px;}
+  .results-title{font-family:var(--font-display);font-size:26px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+  .results-sub{font-size:15px;color:var(--ink-mid);margin-bottom:32px;}
+  .results-score{font-family:var(--font-display);font-size:56px;font-weight:600;color:var(--accent-teal);margin-bottom:4px;}
+  .results-score-label{font-size:14px;color:var(--ink-muted);margin-bottom:36px;}
+  .results-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+  /* EMPTY STATE */
+  .empty-state{text-align:center;padding:60px 20px;color:var(--ink-muted);}
+  .empty-state-icon{font-size:40px;margin-bottom:12px;}
+  .empty-state-title{font-family:var(--font-display);font-size:16px;color:var(--ink);margin-bottom:6px;}
+  .empty-state-sub{font-size:14px;margin-bottom:20px;}
+
+  /* FORM */
+  .form-input{width:100%;padding:12px 16px;border:1.5px solid var(--cream-border);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-body);color:var(--ink);background:var(--cream);outline:none;margin-bottom:12px;box-sizing:border-box;transition:border-color .15s;}
+  .form-input:focus{border-color:var(--accent-teal);background:var(--white);}
+  .form-label{font-size:12px;font-weight:500;color:var(--ink-mid);margin-bottom:6px;display:block;}
+  .color-picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
+  .color-swatch:hover{transform:scale(1.15);}
+  .color-swatch.selected{border-color:var(--ink);transform:scale(1.15);}
+
+  /* DOT COLORS */
+  .dot-teal{background:var(--accent-teal);}
+  .dot-amber{background:var(--accent-amber);}
+  .dot-rose{background:var(--accent-rose);}
+  .dot-sage{background:var(--accent-sage);}
+  .dot-violet{background:var(--accent-violet);}
+  .dot-brown{background:var(--warm-brown);}
+
+  .hidden{display:none!important;}
+  ::-webkit-scrollbar{width:6px;}
+  ::-webkit-scrollbar-track{background:var(--cream);}
+  ::-webkit-scrollbar-thumb{background:var(--cream-border);border-radius:99px;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .fade-up{animation:fadeUp .35s ease forwards;}
+  .fade-up-delay-1{animation:fadeUp .35s ease .05s both;}
+  .fade-up-delay-2{animation:fadeUp .35s ease .1s both;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">Mole<span>cu</span>Learn</div>
+    <div class="logo-sub">Révision · Multi-matières</div>
+  </div>
+  <div class="sidebar-nav">
+    <button class="nav-item active" id="nav-home" onclick="showView('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Accueil
+    </button>
+    <div class="nav-label">Mes matières</div>
+    <div id="subjectNavList"></div>
+    <button class="nav-add-subject" onclick="openNewSubjectModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouvelle matière
+    </button>
+    <div class="nav-label">Outils</div>
+    <button class="nav-item" onclick="openAI()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Tuteur IA
+    </button>
+    <button class="nav-item" onclick="startGlobalExam()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Mode examen
+    </button>
+    <div class="nav-label">Paramètres</div>
+    <button class="nav-item" id="apiKeyBtn" onclick="showApiKeySetup()" style="color:var(--accent-rose);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      Clé API Gemini
+    </button>
+  </div>
+  <div class="score-pill">
+    <div class="score-label">Score global</div>
+    <div><span class="score-value" id="globalScore">0</span><span class="score-pts"> pts</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Tableau de bord</div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline" onclick="openNewSubjectModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouvelle matière
+      </button>
+      <button class="btn btn-primary" onclick="openAI()">🤖 Tuteur IA</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div id="view-home">
+      <div class="hero fade-up">
+        <div class="hero-label">✦ Bienvenue</div>
+        <h1 class="hero-title">Révise toutes tes <em>matières</em></h1>
+        <p class="hero-sub">Crée tes matières, ajoute cours et annales — l'IA génère des questions ciblées et des mécanismes interactifs.</p>
+        <button class="btn btn-primary" onclick="openNewSubjectModal()">Créer ma première matière →</button>
+      </div>
+      <div class="stats-row fade-up-delay-1">
+        <div class="stat-card"><div class="stat-icon teal">📚</div><div><div class="stat-label">Matières</div><div class="stat-value" id="statSubjects">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon amber">❓</div><div><div class="stat-label">Questions au total</div><div class="stat-value" id="statQuestions">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon rose">✅</div><div><div class="stat-label">Bonnes réponses</div><div class="stat-value" id="statCorrect">0</div></div></div>
+      </div>
+      <div class="section-header fade-up-delay-2">
+        <div class="section-title">Mes matières</div>
+      </div>
+      <div class="chapter-grid" id="homeSubjectGrid"></div>
+    </div>
+
+    <!-- SUBJECT VIEW -->
+    <div id="view-subject" class="hidden">
+      <div class="subject-header" id="subjectHeader"></div>
+      <div class="subject-tabs">
+        <button class="subject-tab active" onclick="switchSubjectTab('chapters')">📖 Chapitres</button>
+        <button class="subject-tab" onclick="switchSubjectTab('annales')">📋 Annales</button>
+        <button class="subject-tab" onclick="switchSubjectTab('mechs')">🧪 Mécanismes</button>
+      </div>
+
+      <!-- CHAPTERS TAB -->
+      <div id="subtab-chapters">
+        <div class="upload-zone" id="uploadZoneChapter"
+          onclick="document.getElementById('chapterFileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="event.preventDefault();this.classList.remove('drag-over');if(event.dataTransfer.files[0])processChapterFile(event.dataTransfer.files[0])">
+          <div class="upload-icon">📄</div>
+          <div class="upload-title">Dépose un cours ici</div>
+          <div class="upload-sub">PDF ou texte — l'IA génère 40 questions automatiquement</div>
+        </div>
+        <input type="file" id="chapterFileInput" accept=".pdf,.txt,.md" class="hidden" onchange="if(this.files[0])processChapterFile(this.files[0])">
+        <div id="chapterProcessingArea"></div>
+        <div class="chapter-grid" id="chaptersGrid"></div>
+        <div class="empty-state hidden" id="noChapters">
+          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-title">Aucun chapitre</div>
+          <div class="empty-state-sub">Dépose un PDF de cours pour commencer</div>
+        </div>
+      </div>
+
+      <!-- ANNALES TAB -->
+      <div id="subtab-annales" class="hidden">
+        <div class="upload-zone violet" id="uploadZoneAnnale"
+          onclick="document.getElementById('annaleFileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="event.preventDefault();this.classList.remove('drag-over');if(event.dataTransfer.files[0])processAnnaleFile(event.dataTransfer.files[0])">
+          <div class="upload-icon">📋</div>
+          <div class="upload-title">Dépose une annale ici</div>
+          <div class="upload-sub">PDF ou image — l'IA lit l'énoncé et crée des exercices ciblés</div>
+        </div>
+        <input type="file" id="annaleFileInput" accept=".pdf,.png,.jpg,.jpeg" class="hidden" onchange="if(this.files[0])processAnnaleFile(this.files[0])">
+        <div id="annaleProcessingArea"></div>
+        <div class="chapter-grid" id="annalesGrid"></div>
+        <div class="empty-state hidden" id="noAnnales">
+          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-title">Aucune annale</div>
+          <div class="empty-state-sub">Dépose une annale pour t'entraîner sur de vrais sujets</div>
+        </div>
+      </div>
+
+      <!-- MECHS TAB -->
+      <div id="subtab-mechs" class="hidden">
+        <div style="background:var(--accent-violet-light);border:1px solid #C8C0E0;border-radius:var(--radius);padding:28px 32px;margin-bottom:24px;">
+          <div style="font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-violet);font-weight:500;margin-bottom:8px;">Mode mécanisme</div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:500;color:var(--ink);margin-bottom:8px;">Rédige un mécanisme étape par étape</div>
+          <p style="font-size:14px;color:var(--ink-mid);margin-bottom:20px;max-width:520px;">Décris chaque étape dans tes propres mots. L'IA analyse ta logique et te corrige avec des explications détaillées — pas juste vrai/faux.</p>
+          <button class="btn btn-violet" onclick="startMechSession()">Lancer un mécanisme →</button>
+        </div>
+        <div id="mechSessionArea"></div>
+      </div>
+    </div>
+
+    <!-- QUIZ VIEW -->
+    <div id="view-quiz" class="hidden">
+      <div class="quiz-view">
+        <div class="quiz-header">
+          <button class="quiz-back" onclick="endQuiz()">← Retour</button>
+          <div class="quiz-progress-wrap">
+            <div class="quiz-progress-label"><span id="quizProgressLabel">Question 1 / 10</span><span id="quizScore">0 pts</span></div>
+            <div class="quiz-progress-bar-bg"><div class="quiz-progress-bar-fill" id="quizProgressBar" style="width:10%"></div></div>
+          </div>
+        </div>
+        <div id="questionContainer"></div>
+      </div>
+    </div>
+
+    <!-- MECH QUIZ VIEW -->
+    <div id="view-mechquiz" class="hidden">
+      <div class="quiz-view">
+        <div class="quiz-header">
+          <button class="quiz-back" onclick="endMechQuiz()">← Retour</button>
+          <div style="font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);">🧪 Mode Mécanisme</div>
+        </div>
+        <div id="mechQuizContainer"></div>
+      </div>
+    </div>
+
+    <!-- RESULTS VIEW -->
+    <div id="view-results" class="hidden">
+      <div class="quiz-view">
+        <div class="results-card" id="resultsCard"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- AI PANEL -->
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-panel-header">
+    <div class="ai-panel-title">🤖 Tuteur IA</div>
+    <button class="ai-close" onclick="closeAI()">✕</button>
+  </div>
+  <div class="ai-context-banner" id="aiContextBanner">📖 Contexte : général</div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">Bonjour ! Pose-moi n'importe quelle question sur un concept ou un mécanisme. 🧪</div>
+  </div>
+  <div class="ai-input-wrap">
+    <textarea class="ai-input" id="aiInput" placeholder="Ta question…" rows="2" onkeydown="handleAIKey(event)"></textarea>
+    <button class="ai-send" onclick="sendAIMessage()">➤</button>
+  </div>
+</div>
+<button class="ai-fab" id="aiFab" onclick="openAI()">🤖 Tuteur IA</button>
+
+<!-- MODE POPUP -->
+<div class="overlay" id="modeOverlay" onclick="if(event.target===this)closeModePopup()">
+  <div class="popup">
+    <div class="popup-chapter-label">Chapitre sélectionné</div>
+    <div class="popup-title" id="popupChapterName">—</div>
+    <p class="popup-sub">Quel mode de révision ?</p>
+    <div class="mode-grid">
+      <button class="mode-btn" onclick="selectMode('qcm')" id="mode-qcm"><div class="mode-btn-icon">🎯</div><div class="mode-btn-name">QCM</div><div class="mode-btn-desc">4 choix</div></button>
+      <button class="mode-btn" onclick="selectMode('tf')" id="mode-tf"><div class="mode-btn-icon">✔️</div><div class="mode-btn-name">Vrai / Faux</div><div class="mode-btn-desc">Affirmations rapides</div></button>
+      <button class="mode-btn" onclick="selectMode('fill')" id="mode-fill"><div class="mode-btn-icon">✏️</div><div class="mode-btn-name">Lacunes</div><div class="mode-btn-desc">Compléter les blancs</div></button>
+      <button class="mode-btn" onclick="selectMode('flashcard')" id="mode-flashcard"><div class="mode-btn-icon">🃏</div><div class="mode-btn-name">Flashcards</div><div class="mode-btn-desc">Définitions</div></button>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-outline" onclick="closeModePopup()">Annuler</button>
+      <button class="btn btn-primary" id="startQuizBtn" onclick="launchQuiz()" disabled>Commencer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANNALE MODE POPUP -->
+<div class="overlay" id="annaleModeOverlay" onclick="if(event.target===this)closeAnnaleModePopup()">
+  <div class="popup">
+    <div class="popup-chapter-label">Annale sélectionnée</div>
+    <div class="popup-title" id="annalePopupName">—</div>
+    <p class="popup-sub">Comment veux-tu t'entraîner ?</p>
+    <div class="mode-grid">
+      <button class="mode-btn" onclick="selectAnnaleMode('qcm')" id="annale-mode-qcm"><div class="mode-btn-icon">🎯</div><div class="mode-btn-name">QCM ciblés</div><div class="mode-btn-desc">Questions issues de l'annale</div></button>
+      <button class="mode-btn" onclick="selectAnnaleMode('mech')" id="annale-mode-mech"><div class="mode-btn-icon">🧪</div><div class="mode-btn-name">Mécanismes</div><div class="mode-btn-desc">Étape par étape</div></button>
+      <button class="mode-btn" onclick="selectAnnaleMode('tf')" id="annale-mode-tf"><div class="mode-btn-icon">✔️</div><div class="mode-btn-name">Vrai / Faux</div><div class="mode-btn-desc">Concepts de l'annale</div></button>
+      <button class="mode-btn" onclick="selectAnnaleMode('flashcard')" id="annale-mode-flashcard"><div class="mode-btn-icon">🃏</div><div class="mode-btn-name">Flashcards</div><div class="mode-btn-desc">Notions clés</div></button>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-outline" onclick="closeAnnaleModePopup()">Annuler</button>
+      <button class="btn btn-violet" id="startAnnaleBtn" onclick="launchAnnaleSession()" disabled>Commencer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW SUBJECT MODAL -->
+<div class="overlay" id="newSubjectOverlay" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="popup" style="width:420px;">
+    <div class="popup-title" style="margin-bottom:6px;">Nouvelle matière</div>
+    <p class="popup-sub">Nomme ta matière et choisis une couleur.</p>
+    <label class="form-label">Nom</label>
+    <input class="form-input" id="newSubjectName" placeholder="ex: Chimie Organique, Biochimie, Physique…" onkeydown="if(event.key==='Enter')createSubject()">
+    <label class="form-label">Couleur</label>
+    <div class="color-picker">
+      <div class="color-swatch dot-teal selected" data-color="teal" onclick="selectColor('teal')"></div>
+      <div class="color-swatch dot-amber" data-color="amber" onclick="selectColor('amber')"></div>
+      <div class="color-swatch dot-rose" data-color="rose" onclick="selectColor('rose')"></div>
+      <div class="color-swatch dot-sage" data-color="sage" onclick="selectColor('sage')"></div>
+      <div class="color-swatch dot-violet" data-color="violet" onclick="selectColor('violet')"></div>
+      <div class="color-swatch dot-brown" data-color="brown" onclick="selectColor('brown')"></div>
+    </div>
+    <div class="popup-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('newSubjectOverlay').classList.remove('active')">Annuler</button>
+      <button class="btn btn-primary" onclick="createSubject()">Créer →</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+// ═══════════ GEMINI API ═══════════
+const GEMINI_MODEL="gemini-2.5-flash";
+function getApiKey(){return localStorage.getItem('gemini_api_key')||'';}
+function setApiKey(k){localStorage.setItem('gemini_api_key',k.trim());}
+
+async function callGemini(prompt,maxTokens=4000,forceJSON=false){
+  const key=getApiKey();
+  if(!key)throw new Error('Clé API manquante');
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
+  const cfg={maxOutputTokens:maxTokens,temperature:forceJSON?.2:.7};
+  if(forceJSON)cfg.response_mime_type="application/json";
+  let res;
+  try{res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:cfg})});}
+  catch(e){throw new Error('Connexion impossible.');}
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    if(res.status===429)throw new Error('Quota dépassé — attends quelques secondes.');
+    if(res.status===403)throw new Error('Clé API invalide.');
+    throw new Error(err?.error?.message||'Erreur HTTP '+res.status);
+  }
+  const data=await res.json();
+  const c=data.candidates?.[0];
+  if(!c)throw new Error('Réponse vide.');
+  if(c.finishReason==='SAFETY')throw new Error('Contenu bloqué par Gemini.');
+  return c?.content?.parts?.[0]?.text||"";
+}
+
+// ═══════════ PDF.js ═══════════
+if(typeof pdfjsLib!=='undefined')
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function extractTextFromPDF(buf){
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  let t='';
+  for(let i=1;i<=Math.min(pdf.numPages,30);i++){
+    const page=await pdf.getPage(i);
+    const c=await page.getTextContent();
+    t+=c.items.map(s=>s.str).join(' ')+'\n';
+  }
+  return t;
+}
+
+// ═══════════ STATE ═══════════
+let subjects=JSON.parse(localStorage.getItem('mlv2_subjects')||'[]');
+let stats=JSON.parse(localStorage.getItem('mlv2_stats')||'{"score":0,"correct":0}');
+let currentSubject=null;
+let currentChapter=null;
+let currentAnnale=null;
+let selectedMode=null;
+let selectedAnnaleMode=null;
+let quizQuestions=[];
+let currentQIdx=0;
+let quizScore=0;
+let answered=false;
+let aiContext=null;
+let selectedColor='teal';
+let mechStepCount=4;
+let currentMechQ=null;
+
+function saveData(){
+  localStorage.setItem('mlv2_subjects',JSON.stringify(subjects));
+  localStorage.setItem('mlv2_stats',JSON.stringify(stats));
+}
+
+// ═══════════ VIEWS ═══════════
+function showView(name){
+  document.querySelectorAll('[id^="view-"]').forEach(el=>el.classList.add('hidden'));
+  document.getElementById('view-'+name)?.classList.remove('hidden');
+  const titles={home:'Tableau de bord',subject:currentSubject?.name||'Matière',quiz:'Quiz',mechquiz:'Mécanisme',results:'Résultats'};
+  document.getElementById('topbarTitle').textContent=titles[name]||name;
+  document.querySelectorAll('.nav-item,.nav-subject').forEach(el=>el.classList.remove('active'));
+  if(name==='home'){document.getElementById('nav-home').classList.add('active');renderHome();}
+}
+
+// ═══════════ HOME ═══════════
+function renderHome(){
+  document.getElementById('statSubjects').textContent=subjects.length;
+  const totalQ=subjects.reduce((a,s)=>a+(s.chapters||[]).reduce((b,c)=>b+(c.questions?.length||0),0)+(s.annales||[]).reduce((b,a)=>b+(a.questions?.length||0),0),0);
+  document.getElementById('statQuestions').textContent=totalQ;
+  document.getElementById('statCorrect').textContent=stats.correct;
+  document.getElementById('globalScore').textContent=stats.score;
+  const grid=document.getElementById('homeSubjectGrid');
+  if(!subjects.length){
+    grid.innerHTML=`<div style="color:var(--ink-muted);font-size:14px;grid-column:1/-1;padding:12px 0;">Aucune matière — <a href="#" onclick="openNewSubjectModal();return false;" style="color:var(--accent-teal);">crée la première</a></div>`;
+    return;
+  }
+  grid.innerHTML=subjects.map(s=>{
+    const cc=(s.chapters||[]).length,ac=(s.annales||[]).length;
+    return `<div class="chapter-card color-${s.color}" onclick="openSubject('${s.id}')">
+      <div class="chapter-num">${cc} chapitre${cc!==1?'s':''} · ${ac} annale${ac!==1?'s':''}</div>
+      <div class="chapter-name">${esc(s.name)}</div>
+      <div class="chapter-meta"><span class="chapter-badge badge-new">✦ Matière</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════ SUBJECT NAV ═══════════
+function renderSubjectNav(){
+  document.getElementById('subjectNavList').innerHTML=subjects.map(s=>`
+    <button class="nav-subject${currentSubject?.id===s.id?' active':''}" onclick="openSubject('${s.id}')">
+      <div class="nav-subject-dot dot-${s.color}"></div>
+      <span class="nav-subject-name">${esc(s.name)}</span>
+    </button>`).join('');
+}
+
+// ═══════════ OPEN SUBJECT ═══════════
+function openSubject(id){
+  currentSubject=subjects.find(s=>s.id===id);
+  if(!currentSubject)return;
+  showView('subject');
+  document.getElementById('topbarTitle').textContent=currentSubject.name;
+  renderSubjectNav();
+  document.querySelectorAll('.nav-subject').forEach(el=>el.classList.remove('active'));
+  document.querySelector(`.nav-subject[onclick="openSubject('${id}')"]`)?.classList.add('active');
+  document.getElementById('subjectHeader').innerHTML=`
+    <div class="subject-header-dot dot-${currentSubject.color}"></div>
+    <div class="subject-header-title">${esc(currentSubject.name)}</div>
+    <div class="subject-header-actions">
+      <button class="btn btn-outline" onclick="deleteSubjectConfirm('${id}')" style="font-size:12px;padding:7px 14px;">🗑 Supprimer</button>
+    </div>`;
+  switchSubjectTab('chapters');
+  aiContext={name:currentSubject.name};
+  document.getElementById('aiContextBanner').textContent=`📖 Contexte : ${currentSubject.name}`;
+}
+
+function deleteSubjectConfirm(id){
+  if(!confirm('Supprimer cette matière et tout son contenu ?'))return;
+  subjects=subjects.filter(s=>s.id!==id);
+  saveData();renderSubjectNav();showView('home');renderHome();
+}
+
+// ═══════════ SUBJECT TABS ═══════════
+function switchSubjectTab(tab){
+  ['chapters','annales','mechs'].forEach(t=>{
+    document.getElementById('subtab-'+t).classList.toggle('hidden',t!==tab);
+  });
+  document.querySelectorAll('.subject-tab').forEach((el,i)=>{
+    el.classList.toggle('active',['chapters','annales','mechs'][i]===tab);
+  });
+  if(tab==='chapters')renderChaptersGrid();
+  if(tab==='annales')renderAnnalesGrid();
+  if(tab==='mechs')document.getElementById('mechSessionArea').innerHTML='';
+}
+
+// ═══════════ GRIDS ═══════════
+const COLORS=['color-teal','color-amber','color-rose','color-sage','color-violet'];
+
+function renderChaptersGrid(){
+  const ch=currentSubject?.chapters||[];
+  const grid=document.getElementById('chaptersGrid');
+  const none=document.getElementById('noChapters');
+  if(!ch.length){grid.innerHTML='';none.classList.remove('hidden');return;}
+  none.classList.add('hidden');
+  grid.innerHTML=ch.map((c,i)=>{
+    const prog=c.progress||0,qn=c.questions?.length||0;
+    const badge=prog===0?'badge-new':prog===100?'badge-done':'badge-inprogress';
+    const bl=prog===0?'✦ Nouveau':prog===100?'✓ Terminé':`${prog}%`;
+    return `<div class="chapter-card ${COLORS[i%COLORS.length]}" onclick="openChapter('${c.id}')">
+      <div class="chapter-num">Chapitre ${i+1} · ${qn} questions</div>
+      <div class="chapter-name">${esc(c.name)}</div>
+      <div class="chapter-meta"><span class="chapter-badge ${badge}">${bl}</span></div>
+      <div class="chapter-progress"><div class="chapter-progress-bar" style="width:${prog}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderAnnalesGrid(){
+  const anns=currentSubject?.annales||[];
+  const grid=document.getElementById('annalesGrid');
+  const none=document.getElementById('noAnnales');
+  if(!anns.length){grid.innerHTML='';none.classList.remove('hidden');return;}
+  none.classList.add('hidden');
+  grid.innerHTML=anns.map((a,i)=>{
+    const qn=a.questions?.length||0,mn=a.mechs?.length||0;
+    return `<div class="annale-card" onclick="openAnnale('${a.id}')">
+      <div class="annale-meta">📋 Annale ${i+1}</div>
+      <div class="annale-name">${esc(a.name)}</div>
+      <div class="annale-info">${qn} questions · ${mn} mécanisme${mn!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════ NEW SUBJECT ═══════════
+function openNewSubjectModal(){
+  document.getElementById('newSubjectName').value='';
+  selectColor('teal');
+  document.getElementById('newSubjectOverlay').classList.add('active');
+  setTimeout(()=>document.getElementById('newSubjectName').focus(),100);
+}
+function selectColor(c){
+  selectedColor=c;
+  document.querySelectorAll('.color-swatch').forEach(el=>el.classList.toggle('selected',el.dataset.color===c));
+}
+function createSubject(){
+  const name=document.getElementById('newSubjectName').value.trim();
+  if(!name){document.getElementById('newSubjectName').focus();return;}
+  const s={id:Date.now().toString(),name,color:selectedColor,chapters:[],annales:[],createdAt:new Date().toISOString()};
+  subjects.push(s);saveData();
+  document.getElementById('newSubjectOverlay').classList.remove('active');
+  renderSubjectNav();renderHome();openSubject(s.id);
+}
+
+// ═══════════ CHAPTER UPLOAD ═══════════
+async function processChapterFile(file){
+  if(!getApiKey()){showApiKeySetup();return;}
+  if(file.size>15*1024*1024){alert('Max 15 Mo.');return;}
+  const id=Date.now().toString();
+  const area=document.getElementById('chapterProcessingArea');
+  area.innerHTML=procHTML(id,file.name,false);
+  const setS=msg=>{const el=document.getElementById('proc-status-'+id);if(el)el.textContent=msg;};
+  let content;
+  try{content=await readFile(file,setS);}
+  catch(e){showProcError(area,id,e.message);return;}
+  try{
+    setS('Génération des questions…');
+    const qs=await genChapterQs(content,file.name,id,setS);
+    if(!qs?.length)throw new Error('Aucune question générée.');
+    const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ').trim();
+    currentSubject.chapters.push({id,name,questions:qs,progress:0,addedAt:new Date().toISOString()});
+    saveData();setS(`✅ ${qs.length} questions !`);
+    document.getElementById('proc-'+id)?.querySelector('.processing-spinner')?.remove();
+    setTimeout(()=>{area.innerHTML='';renderChaptersGrid();},1600);
+  }catch(e){showProcError(area,id,e.message);}
+}
+
+// ═══════════ ANNALE UPLOAD ═══════════
+async function processAnnaleFile(file){
+  if(!getApiKey()){showApiKeySetup();return;}
+  if(file.size>15*1024*1024){alert('Max 15 Mo.');return;}
+  const id=Date.now().toString();
+  const area=document.getElementById('annaleProcessingArea');
+  area.innerHTML=procHTML(id,file.name,true);
+  const setS=msg=>{const el=document.getElementById('proc-status-'+id);if(el)el.textContent=msg;};
+  let content='';
+  const isPDF=file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf');
+  try{
+    if(isPDF){
+      setS('Extraction du texte PDF…');
+      const buf=await file.arrayBuffer();
+      content=await extractTextFromPDF(buf);
+      if(!content||content.trim().length<20)content=`[Annale PDF: ${file.name}]`;
+      setS('Analyse de l\'annale…');
+    }else if(file.type.startsWith('image/')){
+      content=`[Image annale: ${file.name}]`;
+      setS('Image chargée. Analyse…');
+    }else{
+      content=await file.text();
+    }
+  }catch(e){showProcError(area,id,e.message);return;}
+  try{
+    const result=await genAnnaleQs(content,file.name,setS);
+    const name=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ').trim();
+    currentSubject.annales.push({id,name,questions:result.questions||[],mechs:result.mechs||[],addedAt:new Date().toISOString()});
+    saveData();
+    const tot=(result.questions?.length||0)+(result.mechs?.length||0);
+    setS(`✅ ${tot} exercices générés !`);
+    document.getElementById('proc-'+id)?.querySelector('.processing-spinner')?.remove();
+    setTimeout(()=>{area.innerHTML='';renderAnnalesGrid();},1600);
+  }catch(e){showProcError(area,id,e.message);}
+}
+
+async function readFile(file,setS){
+  const isPDF=file.type==='application/pdf'||file.name.toLowerCase().endsWith('.pdf');
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onerror=()=>rej(new Error('Lecture impossible.'));
+    r.onload=async e=>{
+      try{
+        let c;
+        if(isPDF){
+          setS('Extraction PDF…');
+          c=await extractTextFromPDF(e.target.result);
+          if(!c||c.trim().length<30)throw new Error('PDF illisible. Exporte en .txt.');
+        }else{c=e.target.result;if(!c||c.trim().length<30)throw new Error('Fichier vide.');}
+        res(c);
+      }catch(err){rej(err);}
+    };
+    if(isPDF)r.readAsArrayBuffer(file);else r.readAsText(file,'UTF-8');
+  });
+}
+
+// ═══════════ GENERATION ═══════════
+async function genAnnaleQs(content,filename,setS){
+  const sn=currentSubject?.name||'cette matière';
+  const clean=content.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,' ').substring(0,8000);
+  const prompt=`Tu es un expert en ${sn}. Analyse cette annale et génère des exercices d'entraînement ciblés basés sur ses thèmes.
+
+ANNALE (${filename}):
+${clean}
+
+Génère un JSON:
+{
+  "questions": [
+    20 questions: 8 QCM (type:"qcm",options[4],correct,explanation), 6 V/F (type:"tf",answer bool,explanation), 4 lacunes (type:"fill",answer), 2 flashcards (type:"flashcard",answer détaillé)
+  ],
+  "mechs": [
+    2-4 mécanismes identifiés dans l'annale: {"question":"Écrire le mécanisme de...","context":"Données/conditions","steps":4,"correction":"Étapes attendues: 1... 2... 3..."}
+  ]
+}
+
+JSON pur sans backticks. Questions directement liées aux thèmes de l'annale. Français.`;
+
+  setS('Génération des exercices d\'annale (1/2)…');
+  try{
+    const raw=await callGemini(prompt,10000,true);
+    const p=parseObj(raw);
+    if(p&&(p.questions?.length||p.mechs?.length))return p;
+  }catch(e){if(e.message.includes('Quota')||e.message.includes('Clé'))throw e;}
+  setS('Génération des exercices d\'annale (2/2)…');
+  const raw2=await callGemini(prompt,10000,false);
+  const p2=parseObj(raw2);
+  if(p2&&(p2.questions?.length||p2.mechs?.length))return p2;
+  throw new Error('Impossible d\'analyser l\'annale.');
+}
+
+async function genChapterQs(content,filename,id,setS){
+  const sn=currentSubject?.name||'cette matière';
+  const clean=content.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,' ').substring(0,8000);
+  const prompt=`Tu es un expert en ${sn}. Génère 40 questions de révision basées STRICTEMENT sur ce cours.
+
+COURS (${filename}):
+${clean}
+
+Tableau JSON de 40 questions:
+- 14 QCM (type:"qcm",options[4],correct 0-3,explanation)
+- 8 Vrai/Faux (type:"tf",answer bool,explanation)
+- 10 Lacunes (type:"fill",answer string)
+- 8 Flashcards (type:"flashcard",answer 3-6 lignes)
+
+JSON pur, tableau [ ... ]. Français.`;
+
+  setS('Génération (1/2)…');
+  try{
+    const raw=await callGemini(prompt,12000,true);
+    const q=parseArr(raw);
+    if(q&&q.length>=8)return validateQs(q);
+  }catch(e){if(e.message.includes('Quota')||e.message.includes('Clé'))throw e;}
+  setS('Génération (2/2)…');
+  const raw2=await callGemini(prompt,12000,false);
+  const q2=parseArr(raw2);
+  if(q2&&q2.length>=5)return validateQs(q2);
+  throw new Error('Impossible de générer des questions valides.');
+}
+
+function parseObj(t){
+  if(!t)return null;
+  let s=t.trim().replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+  try{return JSON.parse(s);}catch(e){const m=s.match(/\{[\s\S]*\}/);if(m)try{return JSON.parse(m[0]);}catch(e2){}return null;}
+}
+function parseArr(t){
+  if(!t)return null;
+  let s=t.trim().replace(/^```json\s*/i,'').replace(/^```\s*/i,'').replace(/\s*```$/i,'').trim();
+  try{const r=JSON.parse(s);return Array.isArray(r)?r:null;}catch(e){const m=s.match(/\[[\s\S]*\]/);if(m)try{const r=JSON.parse(m[0]);return Array.isArray(r)?r:null;}catch(e2){}return null;}
+}
+function validateQs(qs){
+  return qs.filter(q=>{
+    if(!q||!q.type||!q.question)return false;
+    if(q.type==='qcm')return Array.isArray(q.options)&&q.options.length>=2;
+    if(q.type==='tf'){if(typeof q.answer==='string')q.answer=q.answer==='true';return typeof q.answer==='boolean';}
+    if(q.type==='fill')return!!q.answer;
+    if(q.type==='flashcard')return!!q.answer;
+    return false;
+  });
+}
+
+// ═══════════ CHAPTER / ANNALE OPEN ═══════════
+function openChapter(id){
+  currentChapter=currentSubject?.chapters?.find(c=>c.id===id);
+  if(!currentChapter)return;
+  document.getElementById('popupChapterName').textContent=currentChapter.name;
+  selectedMode=null;
+  document.querySelectorAll('#modeOverlay .mode-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('startQuizBtn').disabled=true;
+  document.getElementById('modeOverlay').classList.add('active');
+}
+function selectMode(m){
+  selectedMode=m;
+  document.querySelectorAll('#modeOverlay .mode-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('mode-'+m).classList.add('selected');
+  document.getElementById('startQuizBtn').disabled=false;
+}
+function closeModePopup(){document.getElementById('modeOverlay').classList.remove('active');}
+
+function openAnnale(id){
+  currentAnnale=currentSubject?.annales?.find(a=>a.id===id);
+  if(!currentAnnale)return;
+  document.getElementById('annalePopupName').textContent=currentAnnale.name;
+  selectedAnnaleMode=null;
+  document.querySelectorAll('#annaleModeOverlay .mode-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('startAnnaleBtn').disabled=true;
+  document.getElementById('annaleModeOverlay').classList.add('active');
+}
+function selectAnnaleMode(m){
+  selectedAnnaleMode=m;
+  document.querySelectorAll('#annaleModeOverlay .mode-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('annale-mode-'+m).classList.add('selected');
+  document.getElementById('startAnnaleBtn').disabled=false;
+}
+function closeAnnaleModePopup(){document.getElementById('annaleModeOverlay').classList.remove('active');}
+
+function launchAnnaleSession(){
+  closeAnnaleModePopup();
+  if(!currentAnnale||!selectedAnnaleMode)return;
+  if(selectedAnnaleMode==='mech'){
+    const mechs=currentAnnale.mechs||[];
+    if(!mechs.length){alert('Aucun mécanisme dans cette annale.');return;}
+    currentMechQ=mechs[Math.floor(Math.random()*mechs.length)];
+    mechStepCount=currentMechQ.steps||4;
+    showMechQuiz(currentMechQ);return;
+  }
+  const allQ=currentAnnale.questions||[];
+  const filtered=selectedAnnaleMode==='qcm'?allQ.filter(q=>q.type==='qcm'):
+    selectedAnnaleMode==='tf'?allQ.filter(q=>q.type==='tf'):
+    selectedAnnaleMode==='flashcard'?allQ.filter(q=>q.type==='flashcard'):allQ;
+  if(!filtered.length){alert('Aucune question de ce type dans cette annale.');return;}
+  currentChapter=null;
+  quizQuestions=shuffle(filtered).slice(0,10);
+  currentQIdx=0;quizScore=0;answered=false;
+  showView('quiz');renderQuestion();
+}
+
+// ═══════════ QUIZ ═══════════
+function launchQuiz(){
+  if(!currentChapter||!selectedMode)return;
+  closeModePopup();
+  const filtered=(currentChapter.questions||[]).filter(q=>q.type===selectedMode);
+  quizQuestions=shuffle(filtered).slice(0,10);
+  if(!quizQuestions.length){alert(`Aucune question de type "${selectedMode}".`);return;}
+  currentQIdx=0;quizScore=0;answered=false;
+  showView('quiz');renderQuestion();
+}
+function endQuiz(){if(currentSubject)openSubject(currentSubject.id);else showView('home');}
+
+function renderQuestion(){
+  const tot=quizQuestions.length,q=quizQuestions[currentQIdx];
+  answered=false;
+  document.getElementById('quizProgressLabel').textContent=`Question ${currentQIdx+1} / ${tot}`;
+  document.getElementById('quizScore').textContent=`${quizScore} pts`;
+  document.getElementById('quizProgressBar').style.width=`${(currentQIdx/tot)*100}%`;
+  const tags={qcm:'🎯 QCM',tf:'✔️ Vrai / Faux',fill:'✏️ Lacune',flashcard:'🃏 Flashcard'};
+  let html='';
+  if(q.type==='qcm'){
+    const L=['A','B','C','D'];
+    const opts=q.options.map((o,i)=>`<div class="option" id="opt-${i}" onclick="answerQCM(${i},${q.correct})"><span class="option-letter">${L[i]}</span>${esc(o)}</div>`).join('');
+    html=`<div class="question-card fade-up"><div class="question-mode-tag">${tags.qcm}</div><div class="question-text">${esc(q.question)}</div><div class="options-list">${opts}</div><div class="feedback-box" id="feedback"></div></div>`;
+  }else if(q.type==='tf'){
+    html=`<div class="question-card fade-up"><div class="question-mode-tag">${tags.tf}</div><div class="question-text">${esc(q.question)}</div><div class="tf-options"><button class="tf-btn" id="tf-true" onclick="answerTF(true,${q.answer})">✓ Vrai</button><button class="tf-btn" id="tf-false" onclick="answerTF(false,${q.answer})">✗ Faux</button></div><div class="feedback-box" id="feedback"></div></div>`;
+  }else if(q.type==='fill'){
+    html=`<div class="question-card fade-up"><div class="question-mode-tag">${tags.fill}</div><div class="question-text">${esc(q.question).replace('___','<span style="border-bottom:2px solid var(--accent-teal);padding:0 24px;color:var(--accent-teal)">?</span>')}</div><input type="text" class="fill-blank-input" id="fillInput" placeholder="Ta réponse…" onkeydown="if(event.key==='Enter')answerFill()"><button class="btn btn-primary" onclick="answerFill()">Vérifier</button><div class="feedback-box" id="feedback"></div></div>`;
+  }else if(q.type==='flashcard'){
+    html=`<div class="question-card fade-up" style="cursor:pointer" onclick="flipFlashcard()" id="flashcard"><div class="question-mode-tag">${tags.flashcard} · Clique pour retourner</div><div class="question-text" id="fcFront">${esc(q.question)}</div><div id="fcBack" class="hidden" style="font-size:15px;color:var(--ink-mid);line-height:1.6;margin-bottom:20px;">${esc(q.answer)}</div></div><div class="quiz-nav" id="flashcard-nav" style="display:none;"><button class="btn btn-outline" onclick="fcAnswer(false)" style="margin-right:8px;">😕 À revoir</button><button class="btn btn-primary" onclick="fcAnswer(true)">✓ Je savais</button></div>`;
+  }
+  document.getElementById('questionContainer').innerHTML=html;
+}
+
+function answerQCM(chosen,correct){
+  if(answered)return;answered=true;
+  document.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+  document.getElementById('opt-'+chosen).classList.add(chosen===correct?'correct':'wrong');
+  if(chosen!==correct)document.getElementById('opt-'+correct).classList.add('correct');
+  const q=quizQuestions[currentQIdx];
+  if(chosen===correct){quizScore+=10;showFeedback(true,q.explanation||'Bonne réponse !');}
+  else showFeedback(false,q.explanation||`La bonne réponse : ${q.options[correct]}`);
+  setTimeout(nextQuestion,1800);
+}
+function answerTF(chosen,correct){
+  if(answered)return;answered=true;
+  ['tf-true','tf-false'].forEach(id=>document.getElementById(id).classList.add('disabled'));
+  document.getElementById(chosen?'tf-true':'tf-false').classList.add(chosen===correct?'correct':'wrong');
+  if(chosen!==correct)document.getElementById(correct?'tf-true':'tf-false').classList.add('correct');
+  const q=quizQuestions[currentQIdx];
+  if(chosen===correct){quizScore+=10;showFeedback(true,q.explanation||'Bonne réponse !');}
+  else showFeedback(false,q.explanation||'');
+  setTimeout(nextQuestion,1800);
+}
+function answerFill(){
+  if(answered)return;
+  const inp=document.getElementById('fillInput');
+  const v=inp.value.trim().toLowerCase(),c=quizQuestions[currentQIdx].answer.toLowerCase();
+  answered=true;inp.disabled=true;
+  const ok=v===c||c.includes(v)||v.includes(c);
+  if(ok){quizScore+=10;inp.style.borderColor='var(--accent-sage)';showFeedback(true,`La réponse : ${quizQuestions[currentQIdx].answer}`);}
+  else{inp.style.borderColor='var(--accent-rose)';showFeedback(false,`La bonne réponse : ${quizQuestions[currentQIdx].answer}`);}
+  setTimeout(nextQuestion,2000);
+}
+function flipFlashcard(){
+  if(answered)return;
+  document.getElementById('fcFront').classList.add('hidden');
+  document.getElementById('fcBack').classList.remove('hidden');
+  document.getElementById('flashcard-nav').style.display='flex';
+  answered=true;
+}
+function fcAnswer(knew){if(knew)quizScore+=10;nextQuestion();}
+function showFeedback(ok,msg){
+  const fb=document.getElementById('feedback');
+  fb.className=`feedback-box ${ok?'correct':'wrong'}`;
+  fb.textContent=(ok?'✓ ':'✗ ')+msg;
+}
+function nextQuestion(){
+  currentQIdx++;
+  if(currentQIdx>=quizQuestions.length)endQuizWithResults();
+  else renderQuestion();
+}
+function endQuizWithResults(){
+  stats.score+=quizScore;stats.correct+=Math.round(quizScore/10);
+  const prog=Math.round((quizScore/(quizQuestions.length*10))*100);
+  if(currentChapter){currentChapter.progress=Math.max(currentChapter.progress||0,prog);saveData();}
+  document.getElementById('globalScore').textContent=stats.score;
+  showView('results');
+  const e=prog>=80?'🎉':prog>=50?'👍':'📚';
+  const m=prog>=80?'Excellent !':prog>=50?'Bonne progression !':'Continue à pratiquer !';
+  document.getElementById('resultsCard').innerHTML=`
+    <div class="results-emoji">${e}</div>
+    <div class="results-title">${m}</div>
+    <div class="results-sub">${esc(currentChapter?.name||currentAnnale?.name||'Quiz')}</div>
+    <div class="results-score">${quizScore}</div>
+    <div class="results-score-label">points · ${prog}% de réussite</div>
+    <div class="results-actions">
+      <button class="btn btn-outline" onclick="openSubject('${currentSubject?.id}')">Retour à la matière</button>
+      <button class="btn btn-primary" onclick="showView('home')">Accueil</button>
+    </div>`;
+}
+
+// ═══════════ MECHANISM MODE ═══════════
+function startMechSession(){
+  if(!getApiKey()){showApiKeySetup();return;}
+  const allQ=(currentSubject?.chapters||[]).flatMap(c=>c.questions||[]).filter(q=>q.type==='flashcard'||q.type==='qcm');
+  const ctx=allQ.length?shuffle(allQ).slice(0,3).map(q=>q.question).join(' / '):'';
+  generateFreshMech(ctx);
+}
+
+async function generateFreshMech(ctx=''){
+  const area=document.getElementById('mechSessionArea');
+  area.innerHTML=`<div style="display:flex;align-items:center;gap:14px;padding:20px;background:var(--accent-violet-light);border:1px solid #C8C0E0;border-radius:var(--radius-sm);font-size:14px;color:var(--accent-violet);"><div class="processing-spinner violet" style="width:28px;height:28px;border-width:2.5px;flex-shrink:0;"></div>Génération d'une question de mécanisme…</div>`;
+  const sn=currentSubject?.name||'chimie';
+  const prompt=`Tu es un expert en ${sn}. Génère une question de mécanisme réactionnel pour un étudiant universitaire.${ctx?`\nContexte disponible: ${ctx}`:''}
+
+JSON simple:
+{"question":"Écrire le mécanisme complet de...","context":"Données/réactifs/conditions","steps":4,"correction":"Étapes attendues: 1. ... 2. ... 3. ... 4. ..."}
+
+JSON pur sans backticks.`;
+  try{
+    const raw=await callGemini(prompt,1500,true);
+    const mech=parseObj(raw);
+    if(!mech?.question)throw new Error('Question invalide.');
+    currentMechQ=mech;mechStepCount=mech.steps||4;
+    showMechQuiz(mech);area.innerHTML='';
+  }catch(e){
+    area.innerHTML=`<div style="color:var(--accent-rose);padding:16px;font-size:14px;background:var(--accent-rose-light);border-radius:var(--radius-sm);">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+function showMechQuiz(mech){
+  showView('mechquiz');
+  mechStepCount=mech.steps||4;
+  let stepsHTML='';
+  for(let i=1;i<=mechStepCount;i++){
+    stepsHTML+=`<div class="mech-step" id="mech-step-${i}">
+      <div class="mech-step-num">${i}</div>
+      <div style="flex:1;"><textarea class="mech-step-input" id="mech-input-${i}" placeholder="Étape ${i} : décris ce qui se passe (réactif, intermédiaire, flèches curbes…)" rows="2"></textarea></div>
+    </div>`;
+  }
+  const mechJsonSafe=esc(JSON.stringify(mech));
+  document.getElementById('mechQuizContainer').innerHTML=`
+    <div class="question-card fade-up">
+      <div class="question-mode-tag violet">🧪 Mécanisme</div>
+      <div class="mech-question-box">
+        <div class="mech-question-label">Question</div>
+        <div class="mech-question-text">${esc(mech.question)}</div>
+        ${mech.context?`<div style="font-size:13px;color:var(--ink-mid);margin-top:10px;padding-top:10px;border-top:1px solid #C8C0E0;">${esc(mech.context)}</div>`:''}
+      </div>
+      <div style="font-size:13px;color:var(--ink-muted);margin-bottom:16px;">Rédige chaque étape dans tes propres mots — nomme les intermédiaires, les espèces, les flèches.</div>
+      <div id="mechStepsContainer">${stepsHTML}</div>
+      <div id="mechFeedbackArea"></div>
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:space-between;align-items:center;">
+        <button class="btn btn-outline" onclick="addMechStep()" style="font-size:12px;">+ Étape</button>
+        <button class="btn btn-violet" onclick="evaluateMechanism()">Faire corriger par l'IA →</button>
+      </div>
+    </div>`;
+}
+
+function addMechStep(){
+  mechStepCount++;
+  const i=mechStepCount;
+  const div=document.createElement('div');
+  div.className='mech-step';div.id='mech-step-'+i;
+  div.innerHTML=`<div class="mech-step-num">${i}</div><div style="flex:1;"><textarea class="mech-step-input" id="mech-input-${i}" placeholder="Étape ${i}…" rows="2"></textarea></div>`;
+  document.getElementById('mechStepsContainer').appendChild(div);
+}
+
+async function evaluateMechanism(){
+  const steps=[];
+  for(let i=1;i<=mechStepCount;i++){
+    const v=document.getElementById('mech-input-'+i)?.value?.trim();
+    if(v)steps.push(`Étape ${i}: ${v}`);
+  }
+  if(!steps.length){alert('Rédige au moins une étape !');return;}
+  const fb=document.getElementById('mechFeedbackArea');
+  fb.innerHTML=`<div style="display:flex;align-items:center;gap:14px;padding:20px;background:var(--accent-violet-light);border:1px solid #C8C0E0;border-radius:var(--radius-sm);font-size:14px;color:var(--accent-violet);"><div class="processing-spinner violet" style="width:28px;height:28px;border-width:2.5px;flex-shrink:0;"></div>L'IA analyse ton mécanisme…</div>`;
+  const mech=currentMechQ||{};
+  const sn=currentSubject?.name||'chimie';
+  const prompt=`Tu es un professeur expert en ${sn}. Corrige ce mécanisme de façon pédagogique.
+
+QUESTION: ${mech.question||''}
+${mech.context?`CONTEXTE: ${mech.context}`:''}
+CORRECTION DE RÉFÉRENCE: ${mech.correction||'(non fournie)'}
+
+RÉPONSE DE L'ÉTUDIANT:
+${steps.join('\n')}
+
+JSON de correction:
+{"global":"Appréciation générale","score":7,"scoreMax":10,"steps":[{"step":1,"ok":true,"comment":"..."},{"step":2,"ok":false,"comment":"Erreur: ... La bonne étape: ..."}],"correctionComplete":"Mécanisme complet de référence"}
+
+JSON pur sans backticks.`;
+  try{
+    const raw=await callGemini(prompt,3000,true);
+    const result=parseObj(raw);
+    if(!result)throw new Error('Correction invalide. Réessaie.');
+    renderMechCorrection(result);
+  }catch(e){
+    fb.innerHTML=`<div style="color:var(--accent-rose);padding:16px;font-size:14px;background:var(--accent-rose-light);border-radius:var(--radius-sm);">❌ ${esc(e.message)}</div>`;
+  }
+}
+
+function renderMechCorrection(result){
+  const score=result.score||0,scoreMax=result.scoreMax||10,pct=Math.round((score/scoreMax)*100);
+  const color=pct>=70?'var(--accent-sage)':pct>=40?'var(--accent-amber)':'var(--accent-rose)';
+  let stepsHTML='';
+  (result.steps||[]).forEach(s=>{
+    stepsHTML+=`<div class="mech-step validated ${s.ok?'ok':'wrong'}">
+      <div class="mech-step-num" style="background:${s.ok?'var(--accent-sage)':'var(--accent-rose)'};">${s.ok?'✓':s.step}</div>
+      <div style="flex:1;"><div style="font-weight:500;font-size:13px;margin-bottom:4px;">Étape ${s.step}</div><div class="mech-step-feedback">${esc(s.comment||'')}</div></div>
+    </div>`;
+  });
+  document.getElementById('mechFeedbackArea').innerHTML=`
+    <div style="background:var(--white);border:1px solid var(--cream-border);border-radius:var(--radius);padding:24px;margin-top:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-family:var(--font-display);font-size:18px;font-weight:500;">Correction IA</div>
+        <div style="font-family:var(--font-display);font-size:28px;font-weight:700;color:${color};">${score}/${scoreMax}</div>
+      </div>
+      <div style="font-size:14px;color:var(--ink-mid);line-height:1.6;margin-bottom:20px;padding:16px;background:var(--cream);border-radius:var(--radius-sm);">${esc(result.global||'')}</div>
+      ${stepsHTML}
+      ${result.correctionComplete?`<details style="margin-top:16px;"><summary style="cursor:pointer;font-size:13px;font-weight:500;color:var(--accent-violet);padding:10px 0;">📝 Mécanisme complet de référence</summary><div style="font-size:14px;color:var(--ink-mid);line-height:1.7;padding:16px;background:var(--accent-violet-light);border-radius:var(--radius-sm);margin-top:8px;">${esc(result.correctionComplete)}</div></details>`:''}
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="endMechQuiz()">Retour</button>
+        <button class="btn btn-violet" onclick="startMechSession()">Nouveau mécanisme →</button>
+      </div>
+    </div>`;
+}
+
+function endMechQuiz(){if(currentSubject)openSubject(currentSubject.id);else showView('home');}
+
+// ═══════════ EXAM MODE ═══════════
+function startGlobalExam(){
+  const allQ=subjects.flatMap(s=>(s.chapters||[]).flatMap(c=>c.questions||[]));
+  if(!allQ.length){alert('Ajoute d\'abord des chapitres !');return;}
+  currentChapter={id:'exam',name:'Mode Examen',questions:allQ};
+  currentAnnale=null;
+  quizQuestions=shuffle(allQ).slice(0,20);
+  currentQIdx=0;quizScore=0;answered=false;
+  showView('quiz');renderQuestion();
+}
+
+// ═══════════ AI TUTOR ═══════════
+function openAI(){document.getElementById('aiPanel').classList.add('open');document.getElementById('aiFab').style.display='none';}
+function closeAI(){document.getElementById('aiPanel').classList.remove('open');document.getElementById('aiFab').style.display='flex';}
+function handleAIKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAIMessage();}}
+async function sendAIMessage(){
+  const inp=document.getElementById('aiInput');
+  const msg=inp.value.trim();if(!msg)return;
+  if(!getApiKey()){showApiKeySetup();return;}
+  inp.value='';
+  const msgs=document.getElementById('aiMessages');
+  msgs.innerHTML+=`<div class="ai-msg user">${esc(msg)}</div>`;
+  const loading=document.createElement('div');
+  loading.className='ai-msg bot loading';loading.textContent='En train de réfléchir…';
+  msgs.appendChild(loading);msgs.scrollTop=msgs.scrollHeight;
+  try{
+    const ctx=aiContext?`Tu es un tuteur de ${aiContext.name}. Réponds en français de façon claire et pédagogique.\n\n`:'Tu es un tuteur universitaire. Réponds en français.\n\n';
+    const reply=await callGemini(ctx+msg,1500);
+    loading.className='ai-msg bot';loading.textContent=reply;
+  }catch(e){loading.className='ai-msg bot';loading.textContent='❌ '+e.message;}
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ═══════════ API KEY ═══════════
+function showApiKeySetup(){
+  document.getElementById('apiKeyModal')?.remove();
+  const modal=document.createElement('div');
+  modal.id='apiKeyModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(44,36,22,.5);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML=`<div style="background:#FFFDF8;border-radius:20px;padding:40px;width:460px;max-width:90vw;box-shadow:0 20px 60px rgba(44,36,22,.25);">
+    <div style="font-size:32px;margin-bottom:12px;">🔑</div>
+    <div style="font-family:'Lora',serif;font-size:22px;font-weight:600;color:#2C2416;margin-bottom:8px;">Clé API Gemini</div>
+    <p style="font-size:14px;color:#5A4E3A;margin-bottom:6px;line-height:1.6;">Entre ta clé API Google Gemini. Stockée <strong>uniquement dans ton navigateur</strong>.</p>
+    <p style="font-size:12px;color:#8B7355;margin-bottom:20px;">👉 <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#2D7A6B;">aistudio.google.com</a></p>
+    <input id="apiKeyInput" type="password" placeholder="AIza..." style="width:100%;padding:12px 16px;border:1.5px solid #D9CEB5;border-radius:10px;font-size:14px;font-family:monospace;color:#2C2416;background:#F5F0E8;outline:none;margin-bottom:16px;box-sizing:border-box;" value="${getApiKey()}">
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="document.getElementById('apiKeyModal').remove()" style="padding:10px 20px;border-radius:10px;border:1px solid #D9CEB5;background:transparent;color:#5A4E3A;font-size:13px;cursor:pointer;">Annuler</button>
+      <button onclick="saveApiKey()" style="padding:10px 20px;border-radius:10px;border:none;background:#2D7A6B;color:white;font-size:13px;font-weight:500;cursor:pointer;">Enregistrer</button>
+    </div>
+    <p style="font-size:11px;color:#A08C6E;margin-top:16px;text-align:center;">🔒 Ta clé va directement à Google.</p>
+  </div>`;
+  document.body.appendChild(modal);
+  setTimeout(()=>document.getElementById('apiKeyInput')?.focus(),100);
+}
+function saveApiKey(){
+  const v=document.getElementById('apiKeyInput')?.value?.trim();
+  if(!v||!v.startsWith('AI')){alert('La clé doit commencer par "AI…"');return;}
+  setApiKey(v);document.getElementById('apiKeyModal')?.remove();updateApiKeyBtn();
+}
+function updateApiKeyBtn(){
+  const btn=document.getElementById('apiKeyBtn');
+  if(btn)btn.style.color=getApiKey()?'var(--accent-teal)':'var(--accent-rose)';
+}
+
+// ═══════════ HELPERS ═══════════
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){if(typeof s!=='string')return String(s||'');return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function procHTML(id,fn,isViolet){return `<div class="processing-card" id="proc-${id}"><div class="processing-spinner${isViolet?' violet':''}"></div><div class="processing-info"><div class="processing-name">${esc(fn)}</div><div class="processing-status" id="proc-status-${id}">Chargement…</div></div></div>`;}
+function showProcError(area,id,msg){
+  const el=document.getElementById('proc-status-'+id);
+  if(el)el.innerHTML=`❌ ${esc(msg)} <button onclick="document.getElementById('${area.id||'processingArea'}').innerHTML=''" style="margin-left:8px;padding:4px 10px;border-radius:6px;border:1px solid var(--cream-border);background:var(--cream);cursor:pointer;font-size:12px;">Effacer</button>`;
+  document.getElementById('proc-'+id)?.querySelector('.processing-spinner')?.remove();
+}
+
+// ═══════════ INIT ═══════════
+renderHome();
+renderSubjectNav();
+updateApiKeyBtn();
+if(!getApiKey())setTimeout(()=>showApiKeySetup(),800);
+</script>
+</body>
+</html>
